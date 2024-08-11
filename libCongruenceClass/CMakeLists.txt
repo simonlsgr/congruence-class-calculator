@@ -1,0 +1,3 @@
+add_library(libCongruenceClass Calculations.h)
+target_include_directories(libCongruenceClass PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+set_target_properties(libCongruenceClass PROPERTIES LINKER_LANGUAGE CXX)

@@ -1,0 +1,3 @@
+add_library(libPolynomialOperations PolynomialOperations.h)
+target_include_directories(libPolynomialOperations PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+set_target_properties(libPolynomialOperations PROPERTIES LINKER_LANGUAGE CXX)

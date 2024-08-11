@@ -1,0 +1,3 @@
+add_library(libStringUtils StringUtils.h)
+target_include_directories(libStringUtils PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+set_target_properties(libStringUtils PROPERTIES LINKER_LANGUAGE CXX)
