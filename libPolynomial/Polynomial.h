@@ -55,29 +55,71 @@ public:
     template<class func>
     void sort_polynomial (func && lambda);
     void polynomial_string_to_int_vector();
+    void polynomial_int_vector_to_monomials();
+    void polynomial_monomials_to_string();
 
     void fill_polynomial ();
     std::vector<Monomial<mod>> polynomial_to_monomial_vector_parser(std::string & delimiter);
     void polynomial_string_to_monomial_vector();
-    int degree() const;
 
-    void resize(unsigned long size);
-
+    int degree_of_int_vector() const;
     void update_from_int_vector();
 };
+
+template<int mod>
+void Polynomial<mod>::polynomial_monomials_to_string() {
+    polynomial_as_string.clear();
+
+    std::for_each(std::rbegin(polynomial_as_monomials), std::rend(polynomial_as_monomials), [&](Monomial<mod> & monomial) {
+        if (monomial.get_monomial_coefficient() != 0) {
+            polynomial_as_string.append(monomial.monomial_as_string + "+");
+        }
+    });
+    polynomial_as_string.pop_back();
+}
+
+
+template<int mod>
+void Polynomial<mod>::polynomial_int_vector_to_monomials() {
+    polynomial_as_monomials.clear();
+    int degree = degree_of_int_vector();
+    polynomial_as_monomials.resize(degree+1);
+    if (degree >= 2) {
+        for (int i = degree_of_int_vector(); i >= 2; --i) {
+            if (polynomial_as_int_vector[i] != 1) {
+                std::string monomial_string = std::to_string(polynomial_as_int_vector[i])+"x^"+std::to_string(i);
+                polynomial_as_monomials[i] = Monomial<mod>(monomial_string);
+            } else {
+                std::string monomial_string = "x^"+std::to_string(i);
+                polynomial_as_monomials[i] = Monomial<mod>(monomial_string);
+            }
+        }
+    }
+    if (degree >= 1) {
+        if (int coefficient = polynomial_as_int_vector[1] != 1) {
+            std::string monomial_string = std::to_string(polynomial_as_int_vector[1])+"x";
+            polynomial_as_monomials[1] = Monomial<mod>(monomial_string);
+        } else {
+            std::string monomial_string = "x";
+            polynomial_as_monomials[1] = Monomial<mod>(monomial_string);
+        }
+
+    }
+    if (degree >= 0) {
+        std::string monomial_string = std::to_string(polynomial_as_int_vector[0]);
+        polynomial_as_monomials[0] = Monomial<mod>(monomial_string);
+    }
+}
+
+
 
 
 template<int mod>
 void Polynomial<mod>::update_from_int_vector() {
-
+    polynomial_int_vector_to_monomials();
+    polynomial_monomials_to_string();
 }
 
-template <int mod>
-void Polynomial<mod>::resize(unsigned long size) {
-    // TODO:    int_vector_to_polynomial_string
-    //          int_vector_to_monomial_vector
-    polynomial_as_int_vector.resize(size);
-}
 
 template <int mod>
 Polynomial<mod> operator/(const Polynomial<mod> & dividend, const Polynomial<mod> & divisor) {
@@ -93,7 +135,7 @@ Polynomial<mod> operator%(const Polynomial<mod> & dividend, const Polynomial<mod
 
 
 template <int mod>
-int Polynomial<mod>::degree() const {
+int Polynomial<mod>::degree_of_int_vector() const {
     auto rit = std::find_if(std::rbegin(polynomial_as_int_vector), std::rend(polynomial_as_int_vector), [](int i){return i != 0;});
     if (rit != std::rend(polynomial_as_int_vector)) {
         return std::distance(rit, polynomial_as_int_vector.rend()) - 1;

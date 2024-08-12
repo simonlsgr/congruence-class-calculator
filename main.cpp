@@ -18,7 +18,7 @@ int main() {
 
 //    std::string pol1 = "x^5+x^2+x+1";
 //    std::string pol2 = "x^2+1";
-    std::string pol1 = "2x^3+x^2+1";
+    std::string pol1 = "2x^3+x^2+0x+1";
     std::string pol2 = "2x^2+2x+2";
 //    std::string pol1 = "2x^4+x^3+x^2+2x+2";
 //    std::string pol2 = "2x+2";
@@ -26,6 +26,8 @@ int main() {
 //    std::string pol2 = "x^2+4x+3";
     Polynomial<mod> polynomial1(pol1);
     Polynomial<mod> polynomial2(pol2);
+
+    polynomial1.update_from_int_vector();
     Polynomial<mod> polynomial3 = polynomial1 / polynomial2;
     Polynomial<mod> polynomial4 = polynomial1 % polynomial2;
 
