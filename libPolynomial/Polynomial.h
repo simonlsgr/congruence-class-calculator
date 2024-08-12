@@ -12,6 +12,7 @@
 
 #include "Monomial.h"
 #include "Calculations.h"
+#include "PolynomialDivision.h"
 
 template <int mod>
 class Polynomial {
@@ -59,86 +60,35 @@ public:
     std::vector<Monomial<mod>> polynomial_to_monomial_vector_parser(std::string & delimiter);
     void polynomial_string_to_monomial_vector();
     int degree() const;
+
+    void resize(unsigned long size);
+
+    void update_from_int_vector();
 };
+
+
+template<int mod>
+void Polynomial<mod>::update_from_int_vector() {
+
+}
+
+template <int mod>
+void Polynomial<mod>::resize(unsigned long size) {
+    // TODO:    int_vector_to_polynomial_string
+    //          int_vector_to_monomial_vector
+    polynomial_as_int_vector.resize(size);
+}
 
 template <int mod>
 Polynomial<mod> operator/(const Polynomial<mod> & dividend, const Polynomial<mod> & divisor) {
-    Polynomial<mod> quotient(dividend.degree()-divisor.degree()+1);
-    std::vector<Polynomial<mod>> remainders;
-    std::vector<Polynomial<mod>> subtrahends;
-    remainders.push_back(dividend);
-
-    int counter = 0;
-    while (divisor.degree() <= dividend.degree() - counter) {
-
-        quotient.polynomial_as_int_vector[dividend.degree()-divisor.degree()-counter] = Calculations::positive_modulo(
-                Calculations::multiplicative_inverse(mod, divisor.polynomial_as_int_vector[divisor.degree()])*
-                remainders[counter].polynomial_as_int_vector[dividend.degree() - counter],
-                mod);
-
-        subtrahends.push_back(Polynomial<mod>(dividend.degree()+1));
-        remainders.push_back(Polynomial<mod>(dividend.degree()+1));
-
-        for (int i = dividend.degree() - counter; i >= 0; --i) {
-            if (i + counter - quotient.degree() >= 0) {
-                subtrahends[counter].polynomial_as_int_vector[i] =
-                        Calculations::positive_modulo(
-                                quotient.polynomial_as_int_vector[quotient.degree() - counter] *
-                                divisor.polynomial_as_int_vector[i + counter - quotient.degree()],
-                                mod);
-                remainders[counter + 1].polynomial_as_int_vector[i] = Calculations::positive_modulo(remainders[counter].polynomial_as_int_vector[i]
-                                                                                                    -
-                                                                                                    subtrahends[counter].polynomial_as_int_vector[i],
-                                                                                                    mod);
-            } else {
-                remainders[counter + 1].polynomial_as_int_vector[i] = remainders[counter].polynomial_as_int_vector[i];
-            }
-        }
-        ++counter;
-
-
-    }
-    return quotient;
+    PolynomialDivsion<mod> polynomialDivsion(dividend.polynomial_as_int_vector, divisor.polynomial_as_int_vector);
+    return Polynomial<mod>(polynomialDivsion.quotient);
 }
 
 template <int mod>
 Polynomial<mod> operator%(const Polynomial<mod> & dividend, const Polynomial<mod> & divisor) {
-    Polynomial<mod> quotient(dividend.degree()-divisor.degree()+1);
-    std::vector<Polynomial<mod>> remainders;
-    std::vector<Polynomial<mod>> subtrahends;
-    remainders.push_back(dividend);
-
-    int counter = 0;
-    while (divisor.degree() <= dividend.degree() - counter) {
-
-        quotient.polynomial_as_int_vector[dividend.degree()-divisor.degree()-counter] = Calculations::positive_modulo(
-                Calculations::multiplicative_inverse(mod, divisor.polynomial_as_int_vector[divisor.degree()])*
-                remainders[counter].polynomial_as_int_vector[dividend.degree() - counter],
-                mod);
-
-        subtrahends.push_back(Polynomial<mod>(dividend.degree()+1));
-        remainders.push_back(Polynomial<mod>(dividend.degree()+1));
-
-        for (int i = dividend.degree() - counter; i >= 0; --i) {
-            if (i + counter - quotient.degree() >= 0) {
-                subtrahends[counter].polynomial_as_int_vector[i] =
-                        Calculations::positive_modulo(
-                                quotient.polynomial_as_int_vector[quotient.degree() - counter] *
-                                divisor.polynomial_as_int_vector[i + counter - quotient.degree()],
-                                mod);
-                remainders[counter + 1].polynomial_as_int_vector[i] = Calculations::positive_modulo(remainders[counter].polynomial_as_int_vector[i]
-                                                                                                    -
-                                                                                                    subtrahends[counter].polynomial_as_int_vector[i],
-                                                                                                    mod);
-            } else {
-                remainders[counter + 1].polynomial_as_int_vector[i] = remainders[counter].polynomial_as_int_vector[i];
-            }
-        }
-        ++counter;
-
-
-    }
-    return remainders[remainders.size()-1];
+    PolynomialDivsion<mod> polynomialDivsion(dividend.polynomial_as_int_vector, divisor.polynomial_as_int_vector);
+    return Polynomial<mod>(polynomialDivsion.remainders[polynomialDivsion.remainders.size()-1]);
 }
 
 
@@ -221,5 +171,8 @@ std::vector<Monomial<mod>> Polynomial<mod>::polynomial_to_monomial_vector_parser
     vec_out.push_back(polynomial_as_string_copy);
     return vec_out;
 }
+
+
+
 
 #endif //CONGRUENCE_CLASS_CALCULATOR_POLYNOMIAL_H
