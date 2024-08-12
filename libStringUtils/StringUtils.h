@@ -6,6 +6,7 @@
 #define CONGRUENCE_CLASS_CALCULATOR_STRINGUTILS_H
 
 #include <algorithm>
+#include <string>
 #include "PolynomialOperations.h"
 
 namespace StringUtils {

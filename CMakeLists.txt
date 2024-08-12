@@ -9,7 +9,14 @@ add_subdirectory(libCongruenceClass)
 add_subdirectory(libLaTeXConverter)
 add_subdirectory(libStringUtils)
 add_subdirectory(libPolynomialOperations)
+
+
+add_subdirectory(libPolynomial)
+
 target_link_libraries(congruence-class-calculator libCongruenceClass)
 target_link_libraries(congruence-class-calculator libLaTeXConverter)
 target_link_libraries(congruence-class-calculator libStringUtils)
 target_link_libraries(congruence-class-calculator libPolynomialOperations)
+
+target_link_libraries(congruence-class-calculator Polynomial)
+
