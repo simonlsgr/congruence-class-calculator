@@ -13,8 +13,9 @@ public:
 
     Monomial() {};
 
-    Monomial(std::string & monomial) : monomial_as_string(monomial) {
-
+//    Monomial(std::string & monomial) : monomial_as_string(monomial) {
+//    };
+    Monomial(std::string monomial) : monomial_as_string(std::move(monomial)) {
     };
 
     bool operator<(const Monomial &rhs) const {

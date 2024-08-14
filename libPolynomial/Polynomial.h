@@ -22,21 +22,22 @@ public:
     Polynomial() : Polynomial(empty) {
     };
 
-    Polynomial(std::string & polynomial) :
+    explicit Polynomial(std::string & polynomial) :
     polynomial_as_string(polynomial) {
-        if (polynomial_as_string != "") {
+        if (!polynomial_as_string.empty()) {
             polynomial_string_to_monomial_vector();
             polynomial_string_to_int_vector();
         }
     };
-    Polynomial(size_t deg)
+    explicit Polynomial(size_t deg)
     {
         polynomial_as_int_vector.resize(deg);
         std::memset(polynomial_as_int_vector.data(), 0, sizeof(int)*polynomial_as_int_vector.size());
     }
 
-    Polynomial(std::vector<int> & int_vector) :
+    explicit Polynomial(std::vector<int> & int_vector) :
     polynomial_as_int_vector(int_vector){
+        update_from_int_vector();
     }
 
 
@@ -62,7 +63,7 @@ public:
     std::vector<Monomial<mod>> polynomial_to_monomial_vector_parser(std::string & delimiter);
     void polynomial_string_to_monomial_vector();
 
-    int degree_of_int_vector() const;
+    [[nodiscard]] int degree_of_int_vector() const;
     void update_from_int_vector();
 };
 
@@ -88,26 +89,23 @@ void Polynomial<mod>::polynomial_int_vector_to_monomials() {
         for (int i = degree_of_int_vector(); i >= 2; --i) {
             if (polynomial_as_int_vector[i] != 1) {
                 std::string monomial_string = std::to_string(polynomial_as_int_vector[i])+"x^"+std::to_string(i);
-                polynomial_as_monomials[i] = Monomial<mod>(monomial_string);
+                polynomial_as_monomials[i] = Monomial<mod>(std::to_string(polynomial_as_int_vector[i])+"x^"+std::to_string(i));
             } else {
                 std::string monomial_string = "x^"+std::to_string(i);
-                polynomial_as_monomials[i] = Monomial<mod>(monomial_string);
+                polynomial_as_monomials[i] = Monomial<mod>("x^"+std::to_string(i));
             }
         }
     }
     if (degree >= 1) {
-        if (int coefficient = polynomial_as_int_vector[1] != 1) {
-            std::string monomial_string = std::to_string(polynomial_as_int_vector[1])+"x";
-            polynomial_as_monomials[1] = Monomial<mod>(monomial_string);
+        if (polynomial_as_int_vector[1] != 1) {
+            polynomial_as_monomials[1] = Monomial<mod>(std::to_string(polynomial_as_int_vector[1])+"x");
         } else {
-            std::string monomial_string = "x";
-            polynomial_as_monomials[1] = Monomial<mod>(monomial_string);
+             polynomial_as_monomials[1] = Monomial<mod>("x");
         }
 
     }
     if (degree >= 0) {
-        std::string monomial_string = std::to_string(polynomial_as_int_vector[0]);
-        polynomial_as_monomials[0] = Monomial<mod>(monomial_string);
+        polynomial_as_monomials[0] = Monomial<mod>(std::to_string(polynomial_as_int_vector[0]));
     }
 }
 
@@ -172,13 +170,11 @@ void Polynomial<mod>::fill_polynomial () {
                 ++counter;
             }
         } else {
-            std::string monomial_string = "0x^"+std::to_string(empty_polynomial.size()-i-1);
-            Monomial<mod> monomial(monomial_string);
-            empty_polynomial[i] = monomial;
+            empty_polynomial[i] = Monomial<mod>("0x^"+std::to_string(empty_polynomial.size()-i-1));
         }
     }
 
-    polynomial_as_monomials = empty_polynomial;
+    polynomial_as_monomials = std::move(empty_polynomial);
 }
 
 template<int mod>
@@ -207,10 +203,10 @@ std::vector<Monomial<mod>> Polynomial<mod>::polynomial_to_monomial_vector_parser
     std::vector<Monomial<mod>> vec_out;
     while ((pos = polynomial_as_string_copy.find(delimiter)) != std::string::npos) {
         out = polynomial_as_string_copy.substr(0, pos);
-        vec_out.push_back(out);
+        vec_out.push_back(Monomial<mod>(polynomial_as_string_copy.substr(0, pos)));
         polynomial_as_string_copy.erase(0, pos + delimiter.length());
     }
-    vec_out.push_back(polynomial_as_string_copy);
+    vec_out.push_back(Monomial<mod>(polynomial_as_string_copy));
     return vec_out;
 }
 
